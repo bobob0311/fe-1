@@ -9,6 +9,7 @@ export const dailyData = {
 
     async init() {
         await this.fetch();
+        this.notify();
     },
     async fetch() {
         try {
