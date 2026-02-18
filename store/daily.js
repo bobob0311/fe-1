@@ -5,6 +5,8 @@ export const dailyData = {
     totalIncome: 0,
     totalExpense: 0,
     totalCount: 0,
+    listeners: new Set(),
+
     async init() {
         await this.fetch();
     },
@@ -17,6 +19,15 @@ export const dailyData = {
         } catch (error) {
             console.error('데이터 로딩 중 오류 발생:', error?.message ?? error);
         }
+    },
+
+    subscribe(listener) {
+        this.listeners.add(listener);
+        return () => this.listeners.delete(listener);
+    },
+
+    notify() {
+        this.listeners.forEach((fn) => fn(this));
     },
 
     uploadDailyData(data) {
@@ -44,6 +55,7 @@ export const dailyData = {
                 this.data.splice(index, 0, newGroup);
             }
         }
+        this.notify();
     },
 
     changeDailyData(data) {
@@ -64,6 +76,7 @@ export const dailyData = {
         if (index !== -1) {
             targetDateObj.items[index] = newItems;
         }
+        this.notify();
     },
 
     removeDailyData(id) {
@@ -77,6 +90,7 @@ export const dailyData = {
             }
             return acc;
         }, []);
+        this.notify();
     },
 
     findDailyDataById(id) {
@@ -98,9 +112,11 @@ export const dailyData = {
 
     toggleIncomeFilter() {
         this.filteredIncome = !this.filteredIncome;
+        this.notify();
     },
 
     toggleExpenseFilter() {
         this.filteredExpense = !this.filteredExpense;
+        this.notify();
     },
 };
