@@ -1,7 +1,5 @@
 import { createElement } from '../../utils.js';
 import dateData from '../../store/date.js';
-import { dailyViewChange } from '../../viewHandler/dailyView.js';
-import { dateViewChange } from '../../viewHandler/dateView.js';
 
 const centerNavigationHTML = `
     <button>
@@ -42,12 +40,8 @@ function centerNavigationAddEventListener($wrapper) {
 
     $minusBtn.addEventListener('click', () => {
         dateData.decreaseMonth();
-        dailyViewChange(dateData.year, dateData.month);
-        dateViewChange(dateData.year, dateData.month);
     });
     $plusBtn.addEventListener('click', () => {
         dateData.increaseMonth();
-        dateViewChange(dateData.year, dateData.month);
-        dailyViewChange(dateData.year, dateData.month);
     });
 }

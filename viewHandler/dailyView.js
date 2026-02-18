@@ -2,7 +2,6 @@ import createDaliyList from '../components/dailyList/dailyList.js';
 import { dailyData } from '../store/daily.js';
 import { createElement, formatAmount } from '../utils.js';
 import formData from '../store/formData.js';
-import dateData from '../store/date.js';
 import { bindInputValue } from '../viewHandler/inputView.js';
 
 function createDailyHeader(totalCount, totalIncome, totalExpense) {
@@ -30,7 +29,7 @@ function createDailyHeader(totalCount, totalIncome, totalExpense) {
         </div>`;
 }
 
-export function dailyViewChange(year, month) {
+export function renderDailyView(year, month) {
     const $dailyRoot = document.querySelector('#daily-placeholder');
     $dailyRoot.innerHTML = '';
     dailyData.totalExpense = 0;
@@ -62,11 +61,57 @@ export function dailyViewChange(year, month) {
 
     bindListClickEvent($container);
 }
+/* 
+export function dailyViewChange(year, month) {
+    const $dailyRoot = document.querySelector('#daily-placeholder');
+    $dailyRoot.innerHTML = '';
+    dailyData.totalExpense = 0;
+    dailyData.totalIncome = 0;
+    dailyData.totalCount = 0;
+
+    const $container = createElement('ol', { class: 'daily-list-wrapper' }, '');
+
+    dailyData
+        .getDailyByYearAndMonth(Number(year), Number(month))
+        .forEach((list) => {
+            const $dailyList = createDaliyList(list);
+            if ($dailyList) $container.appendChild($dailyList);
+        });
+
+    $dailyRoot.innerHTML = createDailyHeader(
+        dailyData.totalCount,
+        dailyData.totalIncome,
+        dailyData.totalExpense,
+    );
+    $dailyRoot.appendChild($container);
+
+    bindFilterButtons($dailyRoot);
+
+    bindListClickEvent($container);
+}
+
+
+function bindFilterButtons($rootElement) {
+    const $incomeBtn = $rootElement.querySelector('#filter-income');
+    const $expenseBtn = $rootElement.querySelector('#filter-expense');
+
+    if ($incomeBtn) {
+        $incomeBtn.addEventListener('click', () => {
+            dailyData.toggleIncomeFilter();
+        });
+    }
+
+    if ($expenseBtn) {
+        $expenseBtn.addEventListener('click', () => {
+            dailyData.toggleExpenseFilter();
+        });
+    }
+}
+*/
 
 function addFilterEventListener(targetId, $rootElement, filterFn) {
     $rootElement.querySelector(`#${targetId}`).addEventListener('click', () => {
         filterFn();
-        dailyViewChange(dateData.year, dateData.month);
 
         const $income = document.getElementById('filter-income');
         const $expense = document.getElementById('filter-expense');
@@ -89,7 +134,6 @@ function bindListClickEvent($rootElement) {
 
         if ($deleteBtn) {
             dailyData.removeDailyData(seletedId);
-            dailyViewChange(dateData.year, dateData.month);
             return;
         }
 
