@@ -2,10 +2,22 @@ const dateData = {
     year: null,
     month: null,
 
+    listeners: new Set(),
+
     initDateData() {
         const today = new Date();
         this.year = today.getFullYear();
         this.month = today.getMonth() + 1;
+        this.notify();
+    },
+
+    subscribe(fn) {
+        this.listeners.add(fn);
+        return () => this.listeners.delete(fn);
+    },
+
+    notify() {
+        this.listeners.forEach((fn) => fn(this));
     },
 
     changeMonth(offset) {
@@ -18,6 +30,8 @@ const dateData = {
             this.month = 12;
             this.year -= 1;
         }
+
+        this.notify();
     },
 
     increaseMonth() {
