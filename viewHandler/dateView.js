@@ -1,4 +1,4 @@
-export function dateViewChange(nowYear, nowMonth) {
+export function renderDateView(nowYear, nowMonth) {
     const $headerDateViewWrapper = document.getElementById('location');
 
     const $children = $headerDateViewWrapper.children;
