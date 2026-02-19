@@ -41,10 +41,7 @@ function addAmountInputListener($input, formData) {
     $input.addEventListener('input', (e) => {
         const inputValue = e.target.value;
         const rawValue = inputValue.replace(/[^0-9]/g, '');
-        const formattedValue = formatAmount(rawValue);
-        e.target.value = formattedValue;
-
-        formData.setAmount(inputValue);
+        formData.setAmount(Number(rawValue));
     });
 }
 

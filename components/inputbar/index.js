@@ -5,7 +5,7 @@ import createDescriptionInput from './inputItems/description.js';
 import createPaymentInput from './inputItems/payment.js';
 import createSummitButton from './summitBtn.js';
 import formData from '../../store/formData.js';
-import { bindInputValue } from '../../viewHandler/inputView.js';
+import bindFormDataToInputs from '../../controller/inputController.js';
 
 export default function initalizeInputBox() {
     const $rootElement = document.getElementById('input-placeholder');
@@ -27,5 +27,5 @@ export default function initalizeInputBox() {
     ].forEach(($el) => $rootElement.appendChild($el));
 
     formData.init();
-    bindInputValue(formData);
+    bindFormDataToInputs(formData);
 }
