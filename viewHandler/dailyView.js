@@ -2,7 +2,6 @@ import createDaliyList from '../components/dailyList/dailyList.js';
 import { dailyData } from '../store/daily.js';
 import { createElement, formatAmount } from '../utils.js';
 import formData from '../store/formData.js';
-import { bindInputValue } from '../viewHandler/inputView.js';
 
 function createDailyHeader(totalCount, totalIncome, totalExpense) {
     return `
@@ -61,53 +60,6 @@ export function renderDailyView(year, month) {
 
     bindListClickEvent($container);
 }
-/* 
-export function dailyViewChange(year, month) {
-    const $dailyRoot = document.querySelector('#daily-placeholder');
-    $dailyRoot.innerHTML = '';
-    dailyData.totalExpense = 0;
-    dailyData.totalIncome = 0;
-    dailyData.totalCount = 0;
-
-    const $container = createElement('ol', { class: 'daily-list-wrapper' }, '');
-
-    dailyData
-        .getDailyByYearAndMonth(Number(year), Number(month))
-        .forEach((list) => {
-            const $dailyList = createDaliyList(list);
-            if ($dailyList) $container.appendChild($dailyList);
-        });
-
-    $dailyRoot.innerHTML = createDailyHeader(
-        dailyData.totalCount,
-        dailyData.totalIncome,
-        dailyData.totalExpense,
-    );
-    $dailyRoot.appendChild($container);
-
-    bindFilterButtons($dailyRoot);
-
-    bindListClickEvent($container);
-}
-
-
-function bindFilterButtons($rootElement) {
-    const $incomeBtn = $rootElement.querySelector('#filter-income');
-    const $expenseBtn = $rootElement.querySelector('#filter-expense');
-
-    if ($incomeBtn) {
-        $incomeBtn.addEventListener('click', () => {
-            dailyData.toggleIncomeFilter();
-        });
-    }
-
-    if ($expenseBtn) {
-        $expenseBtn.addEventListener('click', () => {
-            dailyData.toggleExpenseFilter();
-        });
-    }
-}
-*/
 
 function addFilterEventListener(targetId, $rootElement, filterFn) {
     $rootElement.querySelector(`#${targetId}`).addEventListener('click', () => {
@@ -140,7 +92,6 @@ function bindListClickEvent($rootElement) {
         if ($dailyLine.classList.contains('selected')) {
             $dailyLine.classList.remove('selected');
             formData.init();
-            bindInputValue(formData);
             return;
         }
 
@@ -152,6 +103,5 @@ function bindListClickEvent($rootElement) {
         items.amount > 0 ? (items.sign = true) : (items.sign = false);
 
         formData.setFormData(date, items);
-        bindInputValue(formData);
     });
 }
