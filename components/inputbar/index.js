@@ -26,6 +26,6 @@ export default function initalizeInputBox() {
         $summitBtnElement,
     ].forEach(($el) => $rootElement.appendChild($el));
 
-    formData.init();
     bindFormDataToInputs(formData);
+    formData.init();
 }
