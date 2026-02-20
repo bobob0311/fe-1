@@ -8,6 +8,8 @@ export default function createDailyList(year, month) {
             dailyData.totalCount,
             dailyData.totalIncome,
             dailyData.totalExpense,
+            dailyData.filteredIncome,
+            dailyData.filteredExpense,
         ),
         ...dailyData
             .getDailyByYearAndMonth(Number(year), Number(month))
@@ -17,34 +19,22 @@ export default function createDailyList(year, month) {
     return $container;
 }
 
-function createDailyHeader(totalCount, totalIncome, totalExpense) {
+function createDailyHeader(
+    totalCount,
+    totalIncome,
+    totalExpense,
+    filteredIncome,
+    filteredExpense,
+) {
     return createElement('div', { class: 'total-header' }, [
         createTotalCountNode(totalCount),
-        createWholeTotalAmountNode(totalIncome, totalExpense),
+        createWholeTotalAmountNode(
+            totalIncome,
+            totalExpense,
+            filteredIncome,
+            filteredExpense,
+        ),
     ]);
-
-    return `
-        <div class="total-header">
-            <div class="lt-12">전체 내역    ${totalCount}건 </div>
-            <div class="amount-wrapper">
-                <div class="amount-container">    
-                    <button id="filter-income" class="check-wrapper amount-btn-active"> 
-                        <img width="12" height="12" src="/public/check.svg" /> 
-                    </button>
-                    <span class="lt-12">수입: ${formatAmount(
-                        totalIncome,
-                    )}</span>
-                </div>
-                <div class="amount-container">
-                    <button id="filter-expense" class="check-wrapper amount-btn-active"> 
-                        <img width="12" height="12" src="/public/check.svg" /> 
-                    </button>
-                    <span class="lt-12">지출: ${formatAmount(
-                        totalExpense,
-                    )}<span>
-                </div>
-            </div>
-        </div>`;
 }
 
 function createTotalCountNode(totalCount) {
@@ -55,18 +45,23 @@ function createTotalCountNode(totalCount) {
     );
 }
 
-function createWholeTotalAmountNode(totalIncome, totalExpense) {
+function createWholeTotalAmountNode(
+    totalIncome,
+    totalExpense,
+    filteredIncome,
+    filteredExpense,
+) {
     return createElement('div', { class: 'amount-wrapper' }, [
-        createTotalAmountNode(true, totalIncome),
-        createTotalAmountNode(false, totalExpense),
+        createTotalAmountNode(true, totalIncome, filteredIncome),
+        createTotalAmountNode(false, totalExpense, filteredExpense),
     ]);
 }
 
-function createTotalAmountNode(sign, amount) {
+function createTotalAmountNode(sign, amount, checked) {
     const buttonContent = sign ? 'income' : 'expense';
     const amountCase = sign ? '수입' : '지출';
 
-    const $amountButton = createAmountFilterButton(buttonContent);
+    const $amountButton = createAmountFilterButton(buttonContent, checked);
     const $content = createElement(
         'span',
         { class: 'lt-12' },
@@ -79,7 +74,7 @@ function createTotalAmountNode(sign, amount) {
     ]);
 }
 
-function createAmountFilterButton(buttonContent) {
+function createAmountFilterButton(buttonContent, checked) {
     const $checkImg = createElement('img', {
         width: '12',
         height: '12',
@@ -89,7 +84,7 @@ function createAmountFilterButton(buttonContent) {
         'button',
         {
             id: `filter-${buttonContent}`,
-            class: 'check-wrapper amount-btn-active',
+            class: `check-wrapper ${checked ? 'amount-btn-active' : ''}`,
         },
         $checkImg,
     );

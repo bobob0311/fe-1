@@ -1,55 +1,13 @@
-import createDaliyList from '../components/dailyList/dailyList.js';
 import { dailyData } from '../store/daily.js';
-import { createElement, formatAmount } from '../utils.js';
 import formData from '../store/formData.js';
-
-function createDailyHeader(totalCount, totalIncome, totalExpense) {
-    return `
-        <div class="total-header">
-            <div class="lt-12">전체 내역    ${totalCount}건 </div>
-            <div class="amount-wrapper">
-                <div class="amount-container">    
-                    <button id="filter-income" class="check-wrapper amount-btn-active"> 
-                        <img width="12" height="12" src="/public/check.svg" /> 
-                    </button>
-                    <span class="lt-12">수입: ${formatAmount(
-                        totalIncome,
-                    )}</span>
-                </div>
-                <div class="amount-container">
-                    <button id="filter-expense" class="check-wrapper amount-btn-active"> 
-                        <img width="12" height="12" src="/public/check.svg" /> 
-                    </button>
-                    <span class="lt-12">지출: ${formatAmount(
-                        totalExpense,
-                    )}<span>
-                </div>
-            </div>
-        </div>`;
-}
+import createDailyList from '../components/dailyList/dailyList.js';
 
 export function renderDailyView(year, month) {
+    // dailyView 초기화
     const $dailyRoot = document.querySelector('#daily-placeholder');
     $dailyRoot.innerHTML = '';
-    dailyData.totalExpense = 0;
-    dailyData.totalIncome = 0;
-    dailyData.totalCount = 0;
 
-    const $container = createElement('ol', { class: 'daily-list-wrapper' }, '');
-
-    dailyData
-        .getDailyByYearAndMonth(Number(year), Number(month))
-        .forEach((list) => {
-            const $dailyList = createDaliyList(list);
-            if ($dailyList) $container.appendChild($dailyList);
-        });
-
-    $dailyRoot.innerHTML = createDailyHeader(
-        dailyData.totalCount,
-        dailyData.totalIncome,
-        dailyData.totalExpense,
-    );
-    $dailyRoot.appendChild($container);
+    $dailyRoot.append(createDailyList(year, month));
 
     addFilterEventListener('filter-income', $dailyRoot, () =>
         dailyData.toggleIncomeFilter(),
@@ -58,20 +16,12 @@ export function renderDailyView(year, month) {
         dailyData.toggleExpenseFilter(),
     );
 
-    bindListClickEvent($container);
+    bindListClickEvent($dailyRoot);
 }
 
 function addFilterEventListener(targetId, $rootElement, filterFn) {
     $rootElement.querySelector(`#${targetId}`).addEventListener('click', () => {
         filterFn();
-
-        const $income = document.getElementById('filter-income');
-        const $expense = document.getElementById('filter-expense');
-
-        if (dailyData.filteredIncome)
-            $income.classList.remove('amount-btn-active');
-        if (dailyData.filteredExpense)
-            $expense.classList.remove('amount-btn-active');
     });
 }
 
