@@ -23,13 +23,6 @@ function bindEvents($rootElement) {
             return;
         }
 
-        // 삭제 버튼 클릭시 삭제
-        const $deleteBtn = e.target.closest('.daily-delete-btn');
-        if ($deleteBtn) {
-            dailyData.removeDailyData(selectedId);
-            return;
-        }
-
         // 라인  클릭 로직
         const $dailyLine = e.target.closest('.daily-line');
         if (!$dailyLine) return;
@@ -37,6 +30,13 @@ function bindEvents($rootElement) {
         const selectedId = $dailyLine.getAttribute('id');
         if (formData.dailyId == selectedId) {
             formData.init();
+            return;
+        }
+
+        // 삭제 버튼 클릭시 삭제
+        const $deleteBtn = e.target.closest('.daily-delete-btn');
+        if ($deleteBtn) {
+            dailyData.removeDailyData(selectedId);
             return;
         }
 
