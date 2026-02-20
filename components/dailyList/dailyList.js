@@ -3,16 +3,21 @@ import { createElement, formatAmount } from '../../utils.js';
 import createOneDayBox from './oneDayBox.js';
 
 export default function createDailyList(year, month) {
+    const { totalIncome, totalExpense, totalCount } = dailyData.getTotalInfo(
+        year,
+        month,
+    );
+
     const $container = createElement('ol', { class: 'daily-list-wrapper' }, [
         createDailyHeader(
-            dailyData.totalCount,
-            dailyData.totalIncome,
-            dailyData.totalExpense,
+            totalCount,
+            totalIncome,
+            totalExpense,
             dailyData.filteredIncome,
             dailyData.filteredExpense,
         ),
         ...dailyData
-            .getDailyByYearAndMonth(Number(year), Number(month))
+            .getVisibleData(Number(year), Number(month))
             .map((list) => createOneDayBox(list)),
     ]);
 
@@ -65,7 +70,7 @@ function createTotalAmountNode(sign, amount, checked) {
     const $content = createElement(
         'span',
         { class: 'lt-12' },
-        `${amountCase}: ${formatAmount(amount)}`,
+        `${amountCase}: ${formatAmount(Math.abs(amount))}원`,
     );
 
     return createElement('div', { class: 'amount-container' }, [
