@@ -120,4 +120,24 @@ export const dailyData = {
         this.filteredExpense = !this.filteredExpense;
         this.notify();
     },
+
+    getVisibleData(year, month) {
+        return this.data
+            .filter((day) => {
+                const date = new Date(day.date);
+                return (
+                    date.getFullYear() === year && date.getMonth() + 1 === month
+                );
+            })
+            .map((day) => {
+                const filteredItems = day.items.filter((item) => {
+                    if (this.filteredIncome && item.amount > 0) return false;
+                    if (this.filteredExpense && item.amount < 0) return false;
+                    return true;
+                });
+
+                return { ...day, items: filteredItems };
+            })
+            .filter((day) => day.items.length > 0);
+    },
 };
