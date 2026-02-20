@@ -1,4 +1,3 @@
-import { dailyData } from '../../store/daily.js';
 import {
     createElement,
     formatAmount,
@@ -6,88 +5,65 @@ import {
 } from '../../utils.js';
 import createDaily from './daily.js';
 
-function createDailyListContainerInnerHtml(dateToKorean) {
-    return `
-     <div class="daily-header">
-            <div class="date-info">${dateToKorean}</div>
-        </div>
-        <ol class="daliy-line-wrapper"></ol>
-    `;
-}
-
-export default function createDaliyList(dailyInfo) {
+export default function createOneDayBox(dailyInfo) {
     const { date } = dailyInfo;
-    const dateToKorean = formatDateToKorean(date);
-    const dailyListContainerInnerHtml =
-        createDailyListContainerInnerHtml(dateToKorean);
 
-    const $dailyListContainer = createElement(
+    const $oneDayBox = createElement(
         'li',
         {
             class: 'day-container',
         },
-        dailyListContainerInnerHtml,
+        // 1, 1 로 하드코딩되어있는 Income과 expense값 수정 해야됩니다.
+        [createOneDayHeader(date, 1, 1), createOneDayList(dailyInfo)],
     );
 
-    const $dailyListWrapper = $dailyListContainer.querySelector(
-        '.daliy-line-wrapper',
+    return $oneDayBox;
+}
+
+function createOneDayList(dailyInfo) {
+    return createElement(
+        'ol',
+        { class: 'daliy-line-wrapper' },
+        dailyInfo.items.map((info) => createDaily(info)),
+    );
+}
+
+function createOneDayHeader(date, oneDayTotalIncome, oneDayTotalExpense) {
+    const $dateInfo = createDateInfoNode(date);
+    const $amountInfo = createAmountInfoNode(
+        oneDayTotalIncome,
+        oneDayTotalExpense,
     );
 
-    const { totalIncome, totalExpense, totalcnt } =
-        appendDailyListAndCalcAmount($dailyListWrapper, dailyInfo);
-
-    if (totalcnt == 0) return null;
-
-    appendDailyListAmount($dailyListContainer, totalIncome, totalExpense);
-
-    return $dailyListContainer;
+    const $oneDayHeader = createElement('div', { class: 'daily-header' }, [
+        $dateInfo,
+        $amountInfo,
+    ]);
+    return $oneDayHeader;
 }
 
-function appendDailyListAndCalcAmount($root, dailyInfo) {
-    let totalIncome = 0;
-    let totalExpense = 0;
-
-    let totalcnt = 0;
-
-    dailyInfo.items.forEach((info) => {
-        if (
-            (!dailyData.filteredIncome && info.amount > 0) ||
-            (!dailyData.filteredExpense && info.amount < 0)
-        ) {
-            totalcnt++;
-            dailyData.totalCount++;
-            if (info.amount > 0) {
-                totalIncome += info.amount;
-                dailyData.totalIncome += info.amount;
-            } else {
-                totalExpense -= info.amount;
-                dailyData.totalExpense -= info.amount;
-            }
-            $root.appendChild(createDaily(info));
-        }
-    });
-
-    return { totalIncome, totalExpense, totalcnt };
+function createDateInfoNode(date) {
+    const dateToKorean = formatDateToKorean(date);
+    return createElement('div', { class: 'date-info' }, `${dateToKorean}`);
 }
 
-function appendDailyListAmount($dailyListContainer, totalIncome, totalExpense) {
-    let amountHtml = '';
-    amountHtml +=
-        totalIncome != 0
-            ? `<div>수입 ${formatAmount(totalIncome)}원</div>`
+function createAmountInfoNode(oneDayTotalIncome, oneDayTotalExpense) {
+    let amountHTML = '';
+    amountHTML +=
+        oneDayTotalIncome != 0
+            ? `<div>수입 ${formatAmount(oneDayTotalIncome)}원</div>`
             : '';
-    amountHtml +=
-        totalExpense != 0
+    amountHTML +=
+        oneDayTotalExpense != 0
             ? `<div class="amount-line">지출 ${formatAmount(
-                  totalExpense,
+                  oneDayTotalExpense,
               )}원</div>`
             : '';
 
-    const $dailyAmount = createElement(
+    const $amountInfo = createElement(
         'div',
         { class: 'amount-wrapper' },
-        amountHtml,
+        amountHTML,
     );
-
-    $dailyListContainer.querySelector('.date-info').after($dailyAmount);
+    return $amountInfo;
 }
