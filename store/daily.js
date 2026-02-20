@@ -151,6 +151,24 @@ export const dailyData = {
         };
     },
 
+    getDayTotal(day) {
+        let income = 0;
+        let expense = 0;
+
+        day.items.forEach((item) => {
+            if (item.amount > 0) {
+                income += item.amount;
+            } else {
+                expense += item.amount;
+            }
+        });
+
+        return {
+            income,
+            expense,
+        };
+    },
+
     getVisibleData(year, month) {
         return this.data
             .filter((day) => {

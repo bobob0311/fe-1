@@ -16,9 +16,11 @@ export default function createDailyList(year, month) {
             dailyData.filteredIncome,
             dailyData.filteredExpense,
         ),
-        ...dailyData
-            .getVisibleData(Number(year), Number(month))
-            .map((list) => createOneDayBox(list)),
+        ...dailyData.getVisibleData(Number(year), Number(month)).map((list) => {
+            const { income, expense } = dailyData.getDayTotal(list);
+
+            return createOneDayBox(list, income, expense);
+        }),
     ]);
 
     return $container;

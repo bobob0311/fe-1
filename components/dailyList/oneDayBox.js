@@ -5,16 +5,21 @@ import {
 } from '../../utils.js';
 import createDaily from './daily.js';
 
-export default function createOneDayBox(dailyInfo) {
+export default function createOneDayBox(
+    dailyInfo,
+    oneDayTotalIncome,
+    oneDayTotalExpense,
+) {
     const { date } = dailyInfo;
-
     const $oneDayBox = createElement(
         'li',
         {
             class: 'day-container',
         },
-        // 1, 1 로 하드코딩되어있는 Income과 expense값 수정 해야됩니다.
-        [createOneDayHeader(date, 1, 1), createOneDayList(dailyInfo)],
+        [
+            createOneDayHeader(date, oneDayTotalIncome, oneDayTotalExpense),
+            createOneDayList(dailyInfo),
+        ],
     );
 
     return $oneDayBox;
@@ -56,7 +61,7 @@ function createAmountInfoNode(oneDayTotalIncome, oneDayTotalExpense) {
     amountHTML +=
         oneDayTotalExpense != 0
             ? `<div class="amount-line">지출 ${formatAmount(
-                  oneDayTotalExpense,
+                  Math.abs(oneDayTotalExpense),
               )}원</div>`
             : '';
 
