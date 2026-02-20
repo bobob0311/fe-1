@@ -1,69 +1,97 @@
-import {
-    createElement,
-    formatAmount,
-    formatDateToKorean,
-} from '../../utils.js';
-import createDaily from './daily.js';
+import { dailyData } from '../../store/daily.js';
+import { createElement, formatAmount } from '../../utils.js';
+import createOneDayBox from './oneDayBox.js';
 
-export default function createOneDayBox(dailyInfo) {
-    const { date } = dailyInfo;
-
-    const $oneDayBox = createElement(
-        'li',
-        {
-            class: 'day-container',
-        },
-        // 1, 1 로 하드코딩되어있는 Income과 expense값 수정 해야됩니다.
-        [createOneDayHeader(date, 1, 1), createOneDayList(dailyInfo)],
-    );
-
-    return $oneDayBox;
-}
-
-function createOneDayList(dailyInfo) {
-    return createElement(
-        'ol',
-        { class: 'daliy-line-wrapper' },
-        dailyInfo.items.map((info) => createDaily(info)),
-    );
-}
-
-function createOneDayHeader(date, oneDayTotalIncome, oneDayTotalExpense) {
-    const $dateInfo = createDateInfoNode(date);
-    const $amountInfo = createAmountInfoNode(
-        oneDayTotalIncome,
-        oneDayTotalExpense,
-    );
-
-    const $oneDayHeader = createElement('div', { class: 'daily-header' }, [
-        $dateInfo,
-        $amountInfo,
+export default function createDailyList(year, month) {
+    const $container = createElement('ol', { class: 'daily-list-wrapper' }, [
+        createDailyHeader(
+            dailyData.totalCount,
+            dailyData.totalIncome,
+            dailyData.totalExpense,
+        ),
+        ...dailyData
+            .getDailyByYearAndMonth(Number(year), Number(month))
+            .map((list) => createOneDayBox(list)),
     ]);
-    return $oneDayHeader;
+
+    return $container;
 }
 
-function createDateInfoNode(date) {
-    const dateToKorean = formatDateToKorean(date);
-    return createElement('div', { class: 'date-info' }, `${dateToKorean}`);
+function createDailyHeader(totalCount, totalIncome, totalExpense) {
+    return createElement('div', { class: 'total-header' }, [
+        createTotalCountNode(totalCount),
+        createWholeTotalAmountNode(totalIncome, totalExpense),
+    ]);
+
+    return `
+        <div class="total-header">
+            <div class="lt-12">전체 내역    ${totalCount}건 </div>
+            <div class="amount-wrapper">
+                <div class="amount-container">    
+                    <button id="filter-income" class="check-wrapper amount-btn-active"> 
+                        <img width="12" height="12" src="/public/check.svg" /> 
+                    </button>
+                    <span class="lt-12">수입: ${formatAmount(
+                        totalIncome,
+                    )}</span>
+                </div>
+                <div class="amount-container">
+                    <button id="filter-expense" class="check-wrapper amount-btn-active"> 
+                        <img width="12" height="12" src="/public/check.svg" /> 
+                    </button>
+                    <span class="lt-12">지출: ${formatAmount(
+                        totalExpense,
+                    )}<span>
+                </div>
+            </div>
+        </div>`;
 }
 
-function createAmountInfoNode(oneDayTotalIncome, oneDayTotalExpense) {
-    let amountHTML = '';
-    amountHTML +=
-        oneDayTotalIncome != 0
-            ? `<div>수입 ${formatAmount(oneDayTotalIncome)}원</div>`
-            : '';
-    amountHTML +=
-        oneDayTotalExpense != 0
-            ? `<div class="amount-line">지출 ${formatAmount(
-                  oneDayTotalExpense,
-              )}원</div>`
-            : '';
-
-    const $amountInfo = createElement(
+function createTotalCountNode(totalCount) {
+    return createElement(
         'div',
         { class: 'amount-wrapper' },
-        amountHTML,
+        `전체 내역: ${totalCount}건`,
     );
-    return $amountInfo;
+}
+
+function createWholeTotalAmountNode(totalIncome, totalExpense) {
+    return createElement('div', { class: 'amount-wrapper' }, [
+        createTotalAmountNode(true, totalIncome),
+        createTotalAmountNode(false, totalExpense),
+    ]);
+}
+
+function createTotalAmountNode(sign, amount) {
+    const buttonContent = sign ? 'income' : 'expense';
+    const amountCase = sign ? '수입' : '지출';
+
+    const $amountButton = createAmountFilterButton(buttonContent);
+    const $content = createElement(
+        'span',
+        { class: 'lt-12' },
+        `${amountCase}: ${formatAmount(amount)}`,
+    );
+
+    return createElement('div', { class: 'amount-container' }, [
+        $amountButton,
+        $content,
+    ]);
+}
+
+function createAmountFilterButton(buttonContent) {
+    const $checkImg = createElement('img', {
+        width: '12',
+        height: '12',
+        src: '/public/check.svg',
+    });
+    const $button = createElement(
+        'button',
+        {
+            id: `filter-${buttonContent}`,
+            class: 'check-wrapper amount-btn-active',
+        },
+        $checkImg,
+    );
+    return $button;
 }
