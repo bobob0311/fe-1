@@ -1,10 +1,7 @@
 export const dailyData = {
     data: [],
-    filteredIncome: false,
-    filteredExpense: false,
-    totalIncome: 0,
-    totalExpense: 0,
-    totalCount: 0,
+    filteredIncome: true,
+    filteredExpense: true,
     listeners: new Set(),
 
     async init() {
@@ -121,6 +118,39 @@ export const dailyData = {
         this.notify();
     },
 
+    getTotalInfo(year, month) {
+        const monthlyData = this.data.filter((day) => {
+            const date = new Date(day.date);
+            return date.getFullYear() === year && date.getMonth() + 1 === month;
+        });
+
+        const visibleData = this.getVisibleData(year, month);
+
+        let totalIncome = 0;
+        let totalExpense = 0;
+        let totalCount = 0;
+
+        monthlyData.forEach((day) => {
+            day.items.forEach((item) => {
+                if (item.amount > 0) {
+                    totalIncome += item.amount;
+                } else {
+                    totalExpense += item.amount;
+                }
+            });
+        });
+
+        visibleData.forEach((day) => {
+            totalCount += day.items.length;
+        });
+
+        return {
+            totalIncome,
+            totalExpense,
+            totalCount,
+        };
+    },
+
     getVisibleData(year, month) {
         return this.data
             .filter((day) => {
@@ -131,8 +161,8 @@ export const dailyData = {
             })
             .map((day) => {
                 const filteredItems = day.items.filter((item) => {
-                    if (this.filteredIncome && item.amount > 0) return false;
-                    if (this.filteredExpense && item.amount < 0) return false;
+                    if (!this.filteredIncome && item.amount > 0) return false;
+                    if (!this.filteredExpense && item.amount < 0) return false;
                     return true;
                 });
 
