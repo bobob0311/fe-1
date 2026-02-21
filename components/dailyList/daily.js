@@ -1,4 +1,5 @@
 import { createElement } from '../../../utils.js';
+import { dailyData } from '../../store/daily.js';
 import { formatAmount } from '../../utils.js';
 const COLOR = {
     생활: '#A7B9E9',
@@ -38,12 +39,13 @@ function createDailyInnerHtml(dailyInfo) {
 
 export default function createDaily(dailyInfo) {
     const { id } = dailyInfo;
+
     const dailyInnerHtml = createDailyInnerHtml(dailyInfo);
 
     const $dailyInfo = createElement(
         'li',
         {
-            class: 'daily-line',
+            class: `daily-line ${dailyData.getSelectedId() == id ? 'selected' : ''}`,
             id: id,
         },
         dailyInnerHtml,

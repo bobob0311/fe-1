@@ -28,6 +28,7 @@ function bindEvents($rootElement) {
         if (!$dailyLine) return;
 
         const selectedId = $dailyLine.getAttribute('id');
+        dailyData.setSelectedId(selectedId);
         if (formData.dailyId == selectedId) {
             formData.init();
             return;

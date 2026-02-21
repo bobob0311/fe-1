@@ -2,6 +2,7 @@ export const dailyData = {
     data: [],
     filteredIncome: true,
     filteredExpense: true,
+    selectedId: null,
     listeners: new Set(),
 
     async init() {
@@ -116,6 +117,16 @@ export const dailyData = {
     toggleExpenseFilter() {
         this.filteredExpense = !this.filteredExpense;
         this.notify();
+    },
+
+    setSelectedId(id) {
+        if (this.selectedId == id) this.selectedId = null;
+        else this.selectedId = id;
+        this.notify();
+    },
+
+    getSelectedId() {
+        return this.selectedId;
     },
 
     getTotalInfo(year, month) {
