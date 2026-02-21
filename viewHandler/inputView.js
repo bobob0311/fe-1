@@ -8,7 +8,7 @@ function renderAmountInput(amount, sign) {
     if ($signImg)
         $signImg.setAttribute(
             'src',
-            sign ? '/public/minus.svg' : '/public/plus.svg',
+            sign ? '/public/plus.svg' : '/public/minus.svg',
         );
 }
 
