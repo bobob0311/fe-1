@@ -26,6 +26,23 @@ export default function initalizeInputBox() {
         $summitBtnElement,
     ].forEach(($el) => $rootElement.appendChild($el));
 
-    bindFormDataToInputs(formData);
+    initFormEvents($rootElement);
+    //bindFormDataToInputs(formData);
     formData.init();
+}
+
+function initFormEvents($root) {
+    $root.addEventListener('input', (e) => {
+        if (e.target.id === 'valueInput') {
+            const raw = e.target.value.replace(/[^0-9]/g, '');
+            formData.setAmount(Number(raw));
+        }
+    });
+
+    $root.addEventListener('click', (e) => {
+        const toggleBtn = e.target.closest('#toggle-sign');
+        if (toggleBtn) {
+            formData.setSign(!formData.sign);
+        }
+    });
 }

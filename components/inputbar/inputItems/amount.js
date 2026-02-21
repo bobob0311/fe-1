@@ -1,57 +1,46 @@
-import { createElement, formatAmount } from '../../../utils.js';
-import formData from '../../../store/formData.js';
+import { createElement } from '../../../utils.js';
 
-const valueInputInnerHtml = `
-        <label for="valueInput" class="lt-12">
-            금액
-        </label>
-        <div class="value-box">
-            <button id="toggle-sign">
-                <img
-                    id="sign"
-                    src="/public/minus.svg"
-                    aria-label="마이너스 바 "
-                    width="16px"
-                />
-            </button>
-            <input id="valueInput" type="text" class="sb-12" />
-            <span>원</span>
-        </div>
-    `;
-
-export default function createAmountInput() {
+export default function createAmountInput(sign) {
     const $valueInputItem = createElement(
         'div',
         {
             class: 'value-wrapper',
         },
-        valueInputInnerHtml,
+        [createAmountLabelNode(), createContentBox(sign)],
     );
-
-    const $valueInput = $valueInputItem.querySelector('#valueInput');
-    addAmountInputListener($valueInput, formData);
-
-    const $toggleBtn = $valueInputItem.querySelector('#toggle-sign');
-    addSignToggleClickListener($toggleBtn, formData);
-
     return $valueInputItem;
 }
 
-function addAmountInputListener($input, formData) {
-    $input.addEventListener('input', (e) => {
-        const inputValue = e.target.value;
-        const rawValue = inputValue.replace(/[^0-9]/g, '');
-        formData.setAmount(Number(rawValue));
+function createAmountLabelNode() {
+    return createElement(
+        'label',
+        { for: 'valueInput', class: 'lt-12' },
+        '금액',
+    );
+}
+
+function createContentBox(sign) {
+    return createElement('div', { class: 'value-box' }, [
+        createAmountButtonNode(sign),
+        createAmountInputNode(),
+        '<span>원</span>',
+    ]);
+}
+
+function createAmountInputNode() {
+    return createElement('input', {
+        id: 'valueInput',
+        type: 'text',
+        class: 'sb-12',
     });
 }
 
-function addSignToggleClickListener($button, formData) {
-    $button.addEventListener('click', (e) => {
-        const nowSrc = e.target.getAttribute('src');
-        const isMinus = nowSrc.includes('minus');
-        const newSrc = isMinus ? '/public/plus.svg' : '/public/minus.svg';
-
-        e.target.setAttribute('src', newSrc);
-        formData.setSign(!formData.sign);
+function createAmountButtonNode(sign) {
+    const $amountImgNode = createElement('img', {
+        id: 'sign',
+        src: `/public/${sign ? 'plus' : 'minus'}.svg`,
+        'aria-label': `${sign ? '플러스' : '마이너스'}`,
+        width: '16px',
     });
+    return createElement('button', { id: 'toggle-sign' }, $amountImgNode);
 }
