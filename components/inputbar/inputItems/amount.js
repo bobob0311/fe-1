@@ -1,12 +1,12 @@
 import { createElement } from '../../../utils.js';
 
-export default function createAmountInput(sign) {
+export default function createAmountInput(sign, amount) {
     const $valueInputItem = createElement(
         'div',
         {
             class: 'value-wrapper',
         },
-        [createAmountLabelNode(), createContentBox(sign)],
+        [createAmountLabelNode(), createContentBox(sign, amount)],
     );
     return $valueInputItem;
 }
@@ -19,19 +19,21 @@ function createAmountLabelNode() {
     );
 }
 
-function createContentBox(sign) {
+function createContentBox(sign, amount) {
     return createElement('div', { class: 'value-box' }, [
         createAmountButtonNode(sign),
-        createAmountInputNode(),
+        createAmountInputNode(amount),
         '<span>원</span>',
     ]);
 }
 
-function createAmountInputNode() {
+function createAmountInputNode(amount) {
     return createElement('input', {
         id: 'valueInput',
         type: 'text',
+        value: amount,
         class: 'sb-12',
+        'data-field': 'amount',
     });
 }
 
