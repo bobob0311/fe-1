@@ -1,43 +1,52 @@
 import { createElement } from '../../../utils.js';
-import formData from '../../../store/formData.js';
 
-export default function createDescriptionInput() {
-    const descriptionInputInnerHtml = `
-            <span class="count-box-header">
-                <label for="descriptionInput" class="lt-12"> 내용 </label>
-                <span class="count-box lt-12"> <span id="current-text-length"> 0</span>/32</span>
-            </span>
-            <input
-                placeholder="입력하세요"
-                id="descriptionInput"
-                type="text"
-                class="sb-12"
-                maxlength="32"
-            />
-        `;
-
-    const $descriptionInputItem = createElement(
+export default function createDescriptionInput(description) {
+    return createElement(
         'div',
         {
             class: 'description-wrapper',
         },
-        descriptionInputInnerHtml,
+        [
+            createDescriptionHeaderNode(description.length),
+            createDescriptionInputNode(description),
+        ],
     );
+}
 
-    const $input = $descriptionInputItem.querySelector('#descriptionInput');
-    const $currentLength = $descriptionInputItem.querySelector(
-        '#current-text-length',
+function createDescriptionHeaderNode(descriptionLength) {
+    const $headerLabel = createElement(
+        'label',
+        {
+            for: 'descriptionInput',
+            class: 'lt-12',
+        },
+        '내용',
     );
+    const $headeContent = createElement('span', { class: 'count-box lt-12' }, [
+        createElement(
+            'span',
+            { id: 'current-text-length' },
+            String(descriptionLength),
+        ),
+        ' /32',
+    ]);
+    return createElement(
+        'span',
+        {
+            class: 'count-box-header',
+        },
+        [$headerLabel, $headeContent],
+    );
+}
 
-    $input.addEventListener('input', (e) => {
-        $currentLength.textContent = e.target.value.length;
+function createDescriptionInputNode(description) {
+    return createElement('input', {
+        placeholder: '입력하세요',
+        id: 'descriptionInput',
+        value: description,
+        type: 'text',
+        class: 'sb-12',
+        maxlength: '32',
+        'data-field': 'description',
     });
-
-    const $descriptionInput =
-        $descriptionInputItem.querySelector('#descriptionInput');
-    $descriptionInput.addEventListener('input', (e) => {
-        formData.setDescription(e.target.value);
-    });
-
-    return $descriptionInputItem;
 }

@@ -8,11 +8,14 @@ import formData from '../../store/formData.js';
 import bindFormDataToInputs from '../../controller/inputController.js';
 
 export default function initalizeInputBox() {
+    formData.init();
+    const { sign, amount, date, description } = formData;
+
     const $rootElement = document.getElementById('input-placeholder');
 
-    const $dateInputElement = createDateInput();
-    const $valueInputElement = createAmountInput();
-    const $descriptionInputElement = createDescriptionInput();
+    const $dateInputElement = createDateInput(date);
+    const $valueInputElement = createAmountInput(sign, amount);
+    const $descriptionInputElement = createDescriptionInput(description);
     const $paymentInputElement = createPaymentInput();
     const $categoryInputElement = createCategoryInput();
     const $summitBtnElement = createSummitButton();
@@ -28,14 +31,26 @@ export default function initalizeInputBox() {
 
     initFormEvents($rootElement);
     //bindFormDataToInputs(formData);
-    formData.init();
 }
 
 function initFormEvents($root) {
     $root.addEventListener('input', (e) => {
-        if (e.target.id === 'valueInput') {
-            const raw = e.target.value.replace(/[^0-9]/g, '');
-            formData.setAmount(Number(raw));
+        const field = e.target.dataset.field;
+        if (!field) return;
+
+        switch (field) {
+            case 'amount':
+                const raw = e.target.value.replace(/[^0-9]/g, '');
+                formData.setAmount(Number(raw));
+                break;
+
+            case 'description':
+                formData.setDescription(e.target.value);
+                break;
+
+            case 'date':
+                formData.setDate(e.target.value);
+                break;
         }
     });
 
