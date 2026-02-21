@@ -37,7 +37,7 @@ function createDailyInnerHtml(dailyInfo) {
     `;
 }
 
-export default function createDaily(dailyInfo) {
+export default function createDaily(dailyInfo, selectedId) {
     const { id } = dailyInfo;
 
     const dailyInnerHtml = createDailyInnerHtml(dailyInfo);
@@ -45,7 +45,7 @@ export default function createDaily(dailyInfo) {
     const $dailyInfo = createElement(
         'li',
         {
-            class: `daily-line ${dailyData.getSelectedId() == id ? 'selected' : ''}`,
+            class: `daily-line ${selectedId == id ? 'selected' : ''}`,
             id: id,
         },
         dailyInnerHtml,

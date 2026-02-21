@@ -9,6 +9,7 @@ export default function createOneDayBox(
     dailyInfo,
     oneDayTotalIncome,
     oneDayTotalExpense,
+    selectedId,
 ) {
     const { date } = dailyInfo;
     const $oneDayBox = createElement(
@@ -18,18 +19,18 @@ export default function createOneDayBox(
         },
         [
             createOneDayHeader(date, oneDayTotalIncome, oneDayTotalExpense),
-            createOneDayList(dailyInfo),
+            createOneDayList(dailyInfo, selectedId),
         ],
     );
 
     return $oneDayBox;
 }
 
-function createOneDayList(dailyInfo) {
+function createOneDayList(dailyInfo, selectedId) {
     return createElement(
         'ol',
         { class: 'daliy-line-wrapper' },
-        dailyInfo.items.map((info) => createDaily(info)),
+        dailyInfo.items.map((info) => createDaily(info, selectedId)),
     );
 }
 

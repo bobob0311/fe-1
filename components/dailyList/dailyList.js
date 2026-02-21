@@ -7,6 +7,7 @@ export default function createDailyList(year, month) {
         year,
         month,
     );
+    const selectedId = dailyData.getSelectedId();
 
     const $container = createElement('ol', { class: 'daily-list-wrapper' }, [
         createDailyHeader(
@@ -19,7 +20,7 @@ export default function createDailyList(year, month) {
         ...dailyData.getVisibleData(Number(year), Number(month)).map((list) => {
             const { income, expense } = dailyData.getDayTotal(list);
 
-            return createOneDayBox(list, income, expense);
+            return createOneDayBox(list, income, expense, selectedId);
         }),
     ]);
 
