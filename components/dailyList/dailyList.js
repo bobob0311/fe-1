@@ -73,7 +73,7 @@ function createTotalAmountNode(sign, amount, checked) {
     const $content = createElement(
         'span',
         { class: 'lt-12' },
-        `${amountCase}: ${formatAmount(Math.abs(amount))}원`,
+        `${amountCase}: ${amount == '' ? 0 : formatAmount(Math.abs(amount))}원`,
     );
 
     return createElement('div', { class: 'amount-container' }, [

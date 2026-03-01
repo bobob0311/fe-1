@@ -1,4 +1,4 @@
-import { createElement } from '../../../utils.js';
+import { createElement, formatAmount } from '../../../utils.js';
 
 export default function createAmountInput(sign, amount) {
     const $valueInputItem = createElement(
@@ -31,9 +31,10 @@ function createAmountInputNode(amount) {
     return createElement('input', {
         id: 'valueInput',
         type: 'text',
-        value: amount,
+        value: formatAmount(amount),
         class: 'sb-12',
         'data-field': 'amount',
+        placeholder: 0,
     });
 }
 
