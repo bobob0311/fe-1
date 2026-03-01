@@ -17,7 +17,7 @@ dateData.subscribe(({ year, month }) => {
     renderDateView(year, month);
 });
 
-document.getElementById('header-placeholder').append(initializeHeader());
+document.getElementById('header-root').append(initializeHeader());
 initalizeInputBox();
 initalizeDailyList();
 

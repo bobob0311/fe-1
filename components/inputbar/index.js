@@ -13,7 +13,7 @@ export default function initalizeInputBox() {
     formData.init();
     const { sign, amount, date, description } = formData;
 
-    const $rootElement = document.getElementById('input-placeholder');
+    const $rootElement = document.getElementById('input-root');
 
     const $dateInputElement = createDateInput(date);
     const $valueInputElement = createAmountInput(sign, amount);
