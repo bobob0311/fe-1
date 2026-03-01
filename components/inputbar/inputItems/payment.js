@@ -1,50 +1,60 @@
 import { createElement } from '../../../utils.js';
 import createPayemntInputOption from './paymentOption.js';
 
-export default function createPaymentInput() {
-    const paymentInputInnerHtml = `
-            <div class="dropdown-payment">
-                <span class="dropdown-main-payment">
-                    <label for="paymentInput" class="dropdown-label lt-12">분류</label>
-                    <span class="select-btn">
-                        <span id="dropdown-toggle-payment" class="dropdown-btn sb-12">
-                            선택하세요
-                        </span>
-                        <img width="32" height="16" src="/public/chevron-down.svg"/>
-                    </span>
-                </span>
-            </div>
-        `;
-
-    const $paymentInputItem = createElement(
+export default function createPaymentInput(payment, isPaymentOpen) {
+    return createElement(
         'div',
         {
             class: 'payment-wrapper',
         },
-        paymentInputInnerHtml,
+        createPaymentContent(payment, isPaymentOpen),
+    );
+}
+
+function createPaymentContent(payment, isPaymentOpen) {
+    return createElement('div', { class: 'dropdown-payment' }, [
+        createPaymentButton(payment),
+        isPaymentOpen ? createPayemntInputOption() : null,
+        isPaymentOpen ? createPaymentBackground() : null,
+    ]);
+}
+
+function createPaymentButton(payment) {
+    const $paymentLabel = createElement(
+        'label',
+        { for: 'paymentInput', class: 'dropdown-label lt-12' },
+        '분류',
     );
 
-    $paymentInputItem
-        .querySelector('.dropdown-main-payment')
-        .addEventListener('click', () => {
-            const $dropdown =
-                $paymentInputItem.querySelector('.dropdown-payment');
-            $dropdown.appendChild(createPayemntInputOption());
+    const $paymentContent = createElement('span', { class: 'select-btn' }, [
+        createElement(
+            'span',
+            {
+                id: 'dropdown-toggle-payment',
+                class: 'dropdown-btn sb-12',
+            },
+            payment || '선택하세요',
+        ),
+        createElement('img', {
+            width: '32',
+            height: '16',
+            src: '/public/chevron-down.svg',
+        }),
+    ]);
 
-            const $backgroud = createElement(
-                'div',
-                { class: 'select-background' },
-                '',
-            );
+    return createElement(
+        'span',
+        {
+            class: 'dropdown-main-payment',
+            'data-action': 'toggle-payment',
+        },
+        [$paymentLabel, $paymentContent],
+    );
+}
 
-            $dropdown.appendChild($backgroud);
-
-            $backgroud.addEventListener('click', (e) => {
-                e.stopPropagation();
-                $dropdown.querySelector('#dropdown-List-payment').remove();
-                $backgroud.remove();
-            });
-        });
-
-    return $paymentInputItem;
+function createPaymentBackground() {
+    return createElement('div', {
+        class: 'select-background',
+        'data-action': 'close-payment',
+    });
 }
