@@ -33,7 +33,6 @@ export default function bindFormDataToInputs() {
         renderSummitBtn(formData.isValid);
     });
     formData.subscribe('modal', () => {
-        debugger;
         renderModal(formData.modal);
     });
 }
