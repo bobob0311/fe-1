@@ -1,62 +1,58 @@
 import { createElement } from '../../../utils.js';
-import formData from '../../../store/formData.js';
-import categoryInputOption from './categoryOption.js';
+import createCategoryInputOption from './categoryOption.js';
 
-function categoryInputTpl() {
-    return `
-        <div class="dropdown-category">
-            <span class="dropdown-main-category">
-                <label for="categoryInput" class="dropdown-label lt-12">분류</label>
-                <span class="select-btn">
-                    <span id="dropdown-toggle-category" class="dropdown-btn sb-12">
-                        선택하세요
-                    </span>
-                    <img width="32" height="16" src="/public/chevron-down.svg"/>
-                </span>
-            </span>
-        </div>
-    `;
+export default function createCategoryInput(category, isCategoryOpen, sign) {
+    return createElement(
+        'div',
+        { class: 'category-wrapper' },
+        createCategoryContent(category, isCategoryOpen, sign),
+    );
 }
 
-export default function createCategoryInput() {
-    const categoryInputInnerHtml = categoryInputTpl();
-    const $categoryInputItem = createElement(
-        'div',
-        {
-            class: 'category-wrapper',
-        },
-        categoryInputInnerHtml,
+function createCategoryContent(category, isCategoryOpen, sign) {
+    return createElement('div', { class: 'dropdown-category' }, [
+        createCategoryButton(category),
+        isCategoryOpen ? createCategoryInputOption(sign) : null,
+        isCategoryOpen ? createCategoryBackground() : null,
+    ]);
+}
+
+function createCategoryButton(category) {
+    const $categoryLabel = createElement(
+        'label',
+        { for: 'categoryInput', class: 'dropdown-label lt-12' },
+        '분류',
     );
 
-    addCategoryClickListener($categoryInputItem);
+    const $categoryContent = createElement('span', { class: 'select-btn' }, [
+        createElement(
+            'span',
+            {
+                id: 'dropdown-toggle-category',
+                class: 'dropdown-btn sb-12',
+            },
+            category || '선택하세요',
+        ),
+        createElement('img', {
+            width: '32',
+            height: '16',
+            src: '/public/chevron-down.svg',
+        }),
+    ]);
 
-    return $categoryInputItem;
+    return createElement(
+        'span',
+        {
+            class: 'dropdown-main-category',
+            'data-action': 'toggle-category',
+        },
+        [$categoryLabel, $categoryContent],
+    );
 }
 
-function addCategoryClickListener($rootEl) {
-    $rootEl
-        .querySelector('.dropdown-main-category')
-        .addEventListener('click', () => {
-            const sign = formData.sign;
-            const $dropdown = $rootEl.querySelector('.dropdown-category');
-            if (sign) {
-                $dropdown.appendChild(categoryInputOption(sign));
-            } else {
-                $dropdown.appendChild(categoryInputOption(sign));
-            }
-
-            const $backgroud = createElement(
-                'div',
-                { class: 'select-background' },
-                '',
-            );
-
-            $dropdown.appendChild($backgroud);
-
-            $backgroud.addEventListener('click', (e) => {
-                e.stopPropagation();
-                $dropdown.querySelector('#dropdown-List-category').remove();
-                $backgroud.remove();
-            });
-        });
+function createCategoryBackground() {
+    return createElement('div', {
+        class: 'select-background',
+        'data-action': 'close-category',
+    });
 }

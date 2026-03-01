@@ -1,7 +1,6 @@
-import formData from '../../../store/formData.js';
 import { createElement } from '../../../utils.js';
 
-const expenseCategorys = [
+const expenseCategories = [
     '생활',
     '식비',
     '교통',
@@ -11,50 +10,29 @@ const expenseCategorys = [
     '미분류',
 ];
 
-const incomeCategorys = ['월급', '용돈', '기타 수입'];
+const incomeCategories = ['월급', '용돈', '기타 수입'];
 
-export default function categoryInputOption(sign) {
-    let items = [];
-    if (sign) {
-        items = [...incomeCategorys];
-    } else {
-        items = [...expenseCategorys];
-    }
+export default function createCategoryInputOption(sign) {
+    const items = sign ? incomeCategories : expenseCategories;
 
-    const $categoryOptionItemInnerHtml = `
-        ${items
-            .map(
-                (item) =>
-                    `<li id="category-line" data-value="${item}">
-                        <span class="lt-12">${item}</span>
-                    </li>`,
-            )
-            .join('')}
-    `;
-
-    const $categoryOptionItem = createElement(
+    return createElement(
         'ul',
         {
-            id: 'dropdown-List-category',
+            id: 'dropdown-list-category',
             class: 'dropdown-list-category',
         },
-        $categoryOptionItemInnerHtml,
+        items.map((item) => createCategoryItem(item)),
     );
+}
 
-    $categoryOptionItem.addEventListener('click', (e) => {
-        const $targetLine = e.target.closest('#category-line');
-        const selectedCategory = $targetLine.getAttribute('data-value');
-
-        const $dropdownList = document.getElementById('dropdown-List-category');
-        const $background = $dropdownList.nextElementSibling;
-
-        $dropdownList.remove();
-        $background.remove();
-
-        document.getElementById('dropdown-toggle-category').textContent =
-            selectedCategory;
-        formData.setCategory(selectedCategory);
-    });
-
-    return $categoryOptionItem;
+function createCategoryItem(item) {
+    return createElement(
+        'li',
+        {
+            class: 'category-line',
+            'data-action': 'select-category',
+            'data-value': item,
+        },
+        createElement('span', { class: 'lt-12' }, item),
+    );
 }
