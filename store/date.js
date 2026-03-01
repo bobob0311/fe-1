@@ -4,7 +4,7 @@ const dateData = {
 
     listeners: new Set(),
 
-    initDateData() {
+    init() {
         const today = new Date();
         this.year = today.getFullYear();
         this.month = today.getMonth() + 1;
