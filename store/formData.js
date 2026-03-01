@@ -1,13 +1,16 @@
 const formData = {
     date: null,
-    amount: null,
-    description: null,
+    amount: '',
+    description: '',
     payment: null,
+    isPaymentOpen: false,
+    isCategoryOpen: false,
     category: null,
     sign: false,
     isValid: false,
     isEdit: false,
     dailyId: null,
+    modal: null,
     listeners: {},
 
     subscribe(key, listener) {
@@ -29,13 +32,16 @@ const formData = {
     init() {
         this.date = new Date().toISOString().split('T')[0];
         this.amount = '';
-        this.description = null;
+        this.description = '';
         this.payment = null;
+        this.isPaymentOpen = false;
         this.category = null;
+        this.isCategoryOpen = false;
         this.sign = false;
-        this.checkAndNotify();
         this.isEdit = false;
         this.dailyId = null;
+        this.modal = null;
+        this.updateValidity();
         this.notifyAll();
     },
 
@@ -49,6 +55,7 @@ const formData = {
         this.payment = payment;
         this.category = category;
         this.sign = sign;
+        this.updateValidity();
         this.notifyAll();
     },
 
@@ -59,27 +66,27 @@ const formData = {
 
     setDate(dateValue) {
         this.date = dateValue;
-        this.checkAndNotify();
+        this.updateValidity();
         this.notify('date');
     },
     setAmount(amountValue) {
         this.amount = amountValue;
-        this.checkAndNotify();
+        this.updateValidity();
         this.notify('amount');
     },
     setDescription(descriptionValue) {
         this.description = descriptionValue;
-        this.checkAndNotify();
+        this.updateValidity();
         this.notify('description');
     },
     setPayment(paymentValue) {
         this.payment = paymentValue;
-        this.checkAndNotify();
+        this.updateValidity();
         this.notify('payment');
     },
     setCategory(categoryValue) {
         this.category = categoryValue;
-        this.checkAndNotify();
+        this.updateValidity();
         this.notify('category');
     },
     setEdit(editValue) {
@@ -91,26 +98,33 @@ const formData = {
         this.notify('dailyId');
     },
 
-    checkValid() {
-        this.isValid =
-            this.date && this.amount && this.description && this.category;
+    setIsPaymentOpen(value) {
+        this.isPaymentOpen = value;
+        this.notify('payment');
     },
 
-    subscribeIsValid(listener) {
-        this.isValidListeners.add(listener);
-        return () => this.isValidListeners.delete(listener);
+    setIsCategoryOpen(value) {
+        this.isCategoryOpen = value;
+        this.notify('category');
     },
 
-    checkAndNotify() {
-        const prev = this.isValid;
-        this.isValid = !!(
+    setModal(modalState) {
+        this.modal = modalState;
+        this.notify('modal');
+    },
+
+    updateValidity() {
+        const next = !!(
             this.date &&
             this.amount &&
             this.description &&
             this.category
         );
-        if (prev != this.isValid)
-            this.isValidListeners.forEach((fn) => fn(this.isValid, this));
+
+        if (this.isValid !== next) {
+            this.isValid = next;
+            this.notify('validity');
+        }
     },
 };
 
