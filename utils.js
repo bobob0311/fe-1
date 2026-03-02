@@ -1,4 +1,18 @@
 export const createElement = (tag, attributes = {}, content) => {
+    if (tag === 'fragment') {
+        const fragment = document.createDocumentFragment();
+
+        if (Array.isArray(content)) {
+            content.forEach((item) => {
+                if (item instanceof Node) {
+                    fragment.appendChild(item);
+                }
+            });
+        }
+
+        return fragment;
+    }
+
     const $wrapperElement = document.createElement(tag);
 
     Object.entries(attributes).forEach(([key, value]) => {
