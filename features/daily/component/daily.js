@@ -1,6 +1,5 @@
-import { createElement } from '../../../utils.js';
-import { dailyData } from '../../store/daily.js';
-import { formatAmount } from '../../utils.js';
+import { createElement, formatAmount } from '../../../utils.js';
+
 const COLOR = {
     생활: '#A7B9E9',
     '문화/여가': '#BDA6E1',
@@ -14,42 +13,89 @@ const COLOR = {
     월급: '#E39D5D',
 };
 
-function createDailyInnerHtml(dailyInfo) {
-    const { category, description, payment, amount } = dailyInfo;
+export default function createDaily(dailyInfo, selectedId) {
+    const $dailyInfo = createElement('li', {
+        class: `daily-line ${selectedId == id ? 'selected' : ''}`,
+        id: dailyInfo.id,
+    });
 
-    return `
-    <div class="category-info lt-14" style="background-color :${
-        COLOR[category]
-    }" >${category}</div>
-    <div class="description-info lt-14">
-        ${description}
-    </div>
-    <div class="payment-info lt-14">${payment}</div>
-    <div class="amount-info ${
-        amount > 0 ? 'text-blue' : 'text-red'
-    } lt-14">${formatAmount(amount)}원</div>
-    <button class="daily-delete-btn sb-12 hidden"> 
-        <div>
-            <img src=/public/closed.svg/>
-        </div>
-        <span>삭제</span> 
-    </button>
-    `;
+    function buildElements(info) {
+        return [
+            createCategory(info),
+            createDescription(info),
+            createPayment(info),
+            createAmount(info),
+            createDeleteButton(),
+        ];
+    }
+
+    $elements = buildElements(dailyInfo);
+    $elements.forEach((el) => $dailyInfo.appendChild(el));
+
+    function update({ newDailyInfo, newSelectedId }) {
+        if (newDailyInfo) {
+            dailyInfo = newDailyInfo;
+
+            $dailyInfo.innerHTML = '';
+
+            const $newElements = buildElements(dailyInfo);
+            $newElements.forEach((el) => $dailyInfo.appendChild(el));
+        }
+
+        const shouldSelect = newSelectedId == dailyInfo.id;
+        $dailyInfo.classList.toggle('selected', shouldSelect);
+    }
+    return { elemet: $dailyInfo, update };
 }
 
-export default function createDaily(dailyInfo, selectedId) {
-    const { id } = dailyInfo;
-
-    const dailyInnerHtml = createDailyInnerHtml(dailyInfo);
-
-    const $dailyInfo = createElement(
-        'li',
+function createCategory(info) {
+    return createElement(
+        'div',
         {
-            class: `daily-line ${selectedId == id ? 'selected' : ''}`,
-            id: id,
+            class: 'category-info lt-14',
+            style: `background-color:${COLOR[info.category] || '#ccc'}`,
         },
-        dailyInnerHtml,
+        info.category,
     );
+}
 
-    return $dailyInfo;
+function createDescription(info) {
+    return createElement(
+        'div',
+        { class: 'description-info lt-14' },
+        info.description,
+    );
+}
+
+function createPayment(info) {
+    return createElement('div', { class: 'payment-info lt-14' }, info.payment);
+}
+
+function createAmount(info) {
+    return createElement(
+        'div',
+        {
+            class: `amount-info ${
+                info.amount > 0 ? 'text-blue' : 'text-red'
+            } lt-14`,
+        },
+        `${formatAmount(info.amount)}원`,
+    );
+}
+
+function createDeleteButton() {
+    return createElement(
+        'button',
+        {
+            class: 'daily-delete-btn sb-12 hidden',
+        },
+        [
+            createElement('div', {}, [
+                createElement('img', {
+                    src: '/public/closed.svg',
+                }),
+            ]),
+            createElement('span', {}, '삭제'),
+        ],
+    );
 }
