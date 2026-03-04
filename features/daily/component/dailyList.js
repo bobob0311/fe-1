@@ -1,100 +1,69 @@
-import { dailyData } from '../../store/daily.js';
-import { createElement, formatAmount } from '../../utils.js';
+import { createElement } from '../../../utils.js';
 import createOneDayBox from './oneDayBox.js';
+import createDailyListHeader from './dailyListHeader.js'; // 헤더 분리했다는 전제
 
-export default function createDailyList(year, month) {
-    const { totalIncome, totalExpense, totalCount } = dailyData.getTotalInfo(
-        year,
-        month,
-    );
-    const selectedId = dailyData.getSelectedId();
+export default function createDailyList(dateData, dailyData) {
+    const $container = createElement('ol', { class: 'daily-list-wrapper' });
+    let oneDayBoxMap = new Map();
 
-    const $container = createElement('ol', { class: 'daily-list-wrapper' }, [
-        createDailyHeader(
+    function renderAll() {
+        const { totalIncome, totalExpense, totalCount } =
+            dailyData.getTotalInfo(dateData.year, dateData.month);
+
+        const selectedId = dailyData.getSelectedId();
+
+        const $header = createDailyListHeader({
             totalCount,
             totalIncome,
             totalExpense,
-            dailyData.filteredIncome,
-            dailyData.filteredExpense,
-        ),
-        ...dailyData.getVisibleData(Number(year), Number(month)).map((list) => {
-            const { income, expense } = dailyData.getDayTotal(list);
+            filteredIncome: dailyData.filteredIncome,
+            filteredExpense: dailyData.filteredExpense,
+        });
 
-            return createOneDayBox(list, income, expense, selectedId);
-        }),
-    ]);
+        const visibleDays = dailyData.getVisibleData(
+            Number(dateData.year),
+            Number(dateData.month),
+        );
 
-    return $container;
-}
+        oneDayBoxMap = new Map();
 
-function createDailyHeader(
-    totalCount,
-    totalIncome,
-    totalExpense,
-    filteredIncome,
-    filteredExpense,
-) {
-    return createElement('div', { class: 'total-header' }, [
-        createTotalCountNode(totalCount),
-        createWholeTotalAmountNode(
-            totalIncome,
-            totalExpense,
-            filteredIncome,
-            filteredExpense,
-        ),
-    ]);
-}
+        const dayElements = visibleDays.map((dayInfo) => {
+            const { income, expense } = dailyData.getDayTotal(dayInfo);
 
-function createTotalCountNode(totalCount) {
-    return createElement(
-        'div',
-        { class: 'amount-wrapper' },
-        `전체 내역: ${totalCount}건`,
-    );
-}
+            const instance = createOneDayBox(
+                dayInfo,
+                income,
+                expense,
+                selectedId,
+            );
 
-function createWholeTotalAmountNode(
-    totalIncome,
-    totalExpense,
-    filteredIncome,
-    filteredExpense,
-) {
-    return createElement('div', { class: 'amount-wrapper' }, [
-        createTotalAmountNode(true, totalIncome, filteredIncome),
-        createTotalAmountNode(false, totalExpense, filteredExpense),
-    ]);
-}
+            oneDayBoxMap.set(String(dayInfo.date), instance);
 
-function createTotalAmountNode(sign, amount, checked) {
-    const buttonContent = sign ? 'income' : 'expense';
-    const amountCase = sign ? '수입' : '지출';
+            return instance.element;
+        });
 
-    const $amountButton = createAmountFilterButton(buttonContent, checked);
-    const $content = createElement(
-        'span',
-        { class: 'lt-12' },
-        `${amountCase}: ${amount == '' ? 0 : formatAmount(Math.abs(amount))}원`,
-    );
+        $container.replaceChildren($header, ...dayElements);
+    }
 
-    return createElement('div', { class: 'amount-container' }, [
-        $amountButton,
-        $content,
-    ]);
-}
+    renderAll();
 
-function createAmountFilterButton(buttonContent, checked) {
-    const $checkImg = createElement('img', {
-        width: '12',
-        height: '12',
-        src: '/public/check.svg',
-    });
-    const $button = createElement(
-        'button',
-        {
-            id: `filter-${buttonContent}`,
-            class: `check-wrapper ${checked ? 'amount-btn-active' : ''}`,
-        },
-        $checkImg,
-    );
-    return $button;
+    function broadcast(type, state) {
+        oneDayBoxMap.forEach((instance) => instance.update(type, state));
+    }
+
+    function update(type, state) {
+        if (type === 'rerender') {
+            renderAll();
+            return;
+        }
+
+        if (state?.dayKey != null) {
+            oneDayBoxMap.get(String(state.dayKey))?.update(type, state);
+            return;
+        }
+
+        broadcast(type, state);
+    }
+
+    return { element: $container, update };
 }
