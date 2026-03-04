@@ -1,5 +1,44 @@
 import { createElement, formatAmount } from '../../../utils.js';
 
+export default function createDaily(dailyInfo, selectedId) {
+    let currentInfo = dailyInfo;
+
+    const $daily = createElement('li', {
+        class: `daily-line ${selectedId === currentInfo.id ? 'selected' : ''}`,
+        id: currentInfo.id,
+    });
+
+    render($daily, currentInfo);
+
+    function handleDailyUpdate({ newDailyInfo }) {
+        if (!newDailyInfo) return;
+        currentInfo = newDailyInfo;
+
+        render($daily, currentInfo);
+    }
+
+    function handleSelectedUpdate({ newSelectedId }) {
+        $daily.classList.toggle('selected', newSelectedId === currentInfo.id);
+    }
+
+    const handlers = {
+        'daily-update': handleDailyUpdate,
+        'selected-update': handleSelectedUpdate,
+    };
+
+    function update(type, state) {
+        handlers[type]?.(state);
+    }
+
+    return { element: $daily, update };
+}
+
+function render($root, info) {
+    $root.replaceChildren();
+    const $elements = buildDailyElements(info);
+    $elements.forEach(($el) => $root.appendChild($el));
+}
+
 const COLOR = {
     생활: '#A7B9E9',
     '문화/여가': '#BDA6E1',
@@ -13,39 +52,14 @@ const COLOR = {
     월급: '#E39D5D',
 };
 
-export default function createDaily(dailyInfo, selectedId) {
-    const $dailyInfo = createElement('li', {
-        class: `daily-line ${selectedId == id ? 'selected' : ''}`,
-        id: dailyInfo.id,
-    });
-
-    function buildElements(info) {
-        return [
-            createCategory(info),
-            createDescription(info),
-            createPayment(info),
-            createAmount(info),
-            createDeleteButton(),
-        ];
-    }
-
-    $elements = buildElements(dailyInfo);
-    $elements.forEach((el) => $dailyInfo.appendChild(el));
-
-    function update({ newDailyInfo, newSelectedId }) {
-        if (newDailyInfo) {
-            dailyInfo = newDailyInfo;
-
-            $dailyInfo.innerHTML = '';
-
-            const $newElements = buildElements(dailyInfo);
-            $newElements.forEach((el) => $dailyInfo.appendChild(el));
-        }
-
-        const shouldSelect = newSelectedId == dailyInfo.id;
-        $dailyInfo.classList.toggle('selected', shouldSelect);
-    }
-    return { elemet: $dailyInfo, update };
+function buildDailyElements(info) {
+    return [
+        createCategory(info),
+        createDescription(info),
+        createPayment(info),
+        createAmount(info),
+        createDeleteButton(),
+    ];
 }
 
 function createCategory(info) {
