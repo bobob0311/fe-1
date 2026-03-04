@@ -1,9 +1,6 @@
-import {
-    createElement,
-    formatAmount,
-    formatDateToKorean,
-} from '../../utils.js';
-import createDaily from './daily.js';
+import { createElement } from '../../../utils.js';
+import createOneDayHeader from './oneDayBoxHeader.js';
+import createOneDayList from './oneDayDailyList.js';
 
 export default function createOneDayBox(
     dailyInfo,
@@ -12,64 +9,28 @@ export default function createOneDayBox(
     selectedId,
 ) {
     const { date } = dailyInfo;
+    const { element: $oneDayList, update: oneDayListUpdate } = createOneDayList(
+        dailyInfo,
+        selectedId,
+    );
+    const { element: $oneDayHeader, update: oneDayHeaderUpdate } =
+        createOneDayHeader(date, oneDayTotalIncome, oneDayTotalExpense);
+
     const $oneDayBox = createElement(
         'li',
         {
             class: 'day-container',
         },
-        [
-            createOneDayHeader(date, oneDayTotalIncome, oneDayTotalExpense),
-            createOneDayList(dailyInfo, selectedId),
-        ],
+        [$oneDayHeader, $oneDayList],
     );
 
-    return $oneDayBox;
-}
+    function update(type, state) {
+        if (type === 'oneDay-total-update') {
+            oneDayHeaderUpdate(type, state);
+        } else {
+            oneDayListUpdate(type, state);
+        }
+    }
 
-function createOneDayList(dailyInfo, selectedId) {
-    return createElement(
-        'ol',
-        { class: 'daliy-line-wrapper' },
-        dailyInfo.items.map((info) => createDaily(info, selectedId)),
-    );
-}
-
-function createOneDayHeader(date, oneDayTotalIncome, oneDayTotalExpense) {
-    const $dateInfo = createDateInfoNode(date);
-    const $amountInfo = createAmountInfoNode(
-        oneDayTotalIncome,
-        oneDayTotalExpense,
-    );
-
-    const $oneDayHeader = createElement('div', { class: 'daily-header' }, [
-        $dateInfo,
-        $amountInfo,
-    ]);
-    return $oneDayHeader;
-}
-
-function createDateInfoNode(date) {
-    const dateToKorean = formatDateToKorean(date);
-    return createElement('div', { class: 'date-info' }, `${dateToKorean}`);
-}
-
-function createAmountInfoNode(oneDayTotalIncome, oneDayTotalExpense) {
-    let amountHTML = '';
-    amountHTML +=
-        oneDayTotalIncome != 0
-            ? `<div>수입 ${formatAmount(oneDayTotalIncome)}원</div>`
-            : '';
-    amountHTML +=
-        oneDayTotalExpense != 0
-            ? `<div class="amount-line">지출 ${formatAmount(
-                  Math.abs(oneDayTotalExpense),
-              )}원</div>`
-            : '';
-
-    const $amountInfo = createElement(
-        'div',
-        { class: 'amount-wrapper' },
-        amountHTML,
-    );
-    return $amountInfo;
+    return { element: $oneDayBox, update };
 }
