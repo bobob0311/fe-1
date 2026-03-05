@@ -1,8 +1,8 @@
 @import './reset.css';
-@import './features/header/index.css';
-@import './features/inputBox/index.css';
-@import './components/dailyList/index.css';
-@import './components/modal/index.css';
+@import './src/features/header/index.css';
+@import './src/features/inputBox/index.css';
+@import './src/features/daily/index.css';
+@import './src/features/modal/index.css';
 
 :root {
     --grayscale-50: #ffffff;

@@ -1,9 +1,9 @@
-export const dailyData = {
+const dailyData = {
     data: [],
     filteredIncome: true,
     filteredExpense: true,
     selectedId: null,
-    listeners: new Set(),
+    listeners: {},
 
     async init() {
         await this.fetch();
@@ -20,13 +20,14 @@ export const dailyData = {
         }
     },
 
-    subscribe(listener) {
-        this.listeners.add(listener);
-        return () => this.listeners.delete(listener);
+    subscribe(key, listener) {
+        if (!this.listeners[key]) this.listeners[key] = new Set();
+        this.listeners[key].add(listener);
+        return () => this.listeners[key].delete(listener);
     },
 
-    notify() {
-        this.listeners.forEach((fn) => fn(this));
+    notify(key, data) {
+        this.listeners[key]?.forEach((fn) => fn(data ?? this));
     },
 
     uploadDailyData(data) {
@@ -54,13 +55,13 @@ export const dailyData = {
                 this.data.splice(index, 0, newGroup);
             }
         }
-        this.notify();
+        this.notify('rerender');
     },
 
     changeDailyData(data) {
         const { amount, category, date, description, payment, sign } = data;
         const newItems = {
-            id: crypto.randomUUID(),
+            id: data.dailyId,
             category,
             description,
             payment,
@@ -75,7 +76,9 @@ export const dailyData = {
         if (index !== -1) {
             targetDateObj.items[index] = newItems;
         }
-        this.notify();
+
+        this.setSelectedId(null);
+        this.notify('daily-update', { newDailyInfo: newItems });
     },
 
     removeDailyData(id) {
@@ -89,7 +92,7 @@ export const dailyData = {
             }
             return acc;
         }, []);
-        this.notify();
+        this.notify('rerender');
     },
 
     findDailyDataById(id) {
@@ -111,18 +114,18 @@ export const dailyData = {
 
     toggleIncomeFilter() {
         this.filteredIncome = !this.filteredIncome;
-        this.notify();
+        this.notify('rerender');
     },
 
     toggleExpenseFilter() {
         this.filteredExpense = !this.filteredExpense;
-        this.notify();
+        this.notify('rerender');
     },
 
     setSelectedId(id) {
         if (this.selectedId == id) this.selectedId = null;
         else this.selectedId = id;
-        this.notify();
+        this.notify('selected-update', { newSelectedId: this.selectedId });
     },
 
     getSelectedId() {
@@ -200,3 +203,5 @@ export const dailyData = {
             .filter((day) => day.items.length > 0);
     },
 };
+
+export default dailyData;
